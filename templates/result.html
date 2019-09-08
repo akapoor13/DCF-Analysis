@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Deep Finalyst - Dashboard</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+
+  <!-- Page level plugin CSS-->
+  <link href="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.css') }}" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="{{ url_for('static', filename='css/sb-admin.css') }}" rel = "stylesheet">
+
+
+  <!-- Jquery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.min.js"> </script>
+
+  <!-- d3.js for graphing -->
+
+</head>
+
+<body id="page-top">
+
+  <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+
+    <a class="navbar-brand mr-1" href="index.html"> </a>
+
+    <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navbar Search -->
+    <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for a ticker..." aria-label="Search" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Navbar -->
+
+  </nav>
+
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="sidebar navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('index') }}">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">
+          <i class="fas fa-fw fa-chart-area"></i>
+          <span>Charts</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="">
+          <i class="fas fa-fw fa-table"></i>
+          <span>Tables</span></a>
+      </li>
+    </ul>
+
+    <div id="content-wrapper">
+
+      <div class="container-fluid">
+
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Dashboard</a>
+          </li>
+          <li class="breadcrumb-item active">Overview of {{ ticker }} </li>
+        </ol>
+
+        <!-- Area Chart Example-->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-chart-area"></i>
+            Market Intelligence (sourced from Marquee)</div>
+          <div class="card-body">
+            <canvas id="myAreaChart" width="100%" height="60"></canvas>
+            <p class = "font-weight-bold"> What do these factors mean? </p>
+            <p> <span class = "font-italic"> Growth </span> </p>
+            <p> Based on a stock's forward-looking sales growth, EBITDA growth and EPS growth (for financial stocks, only EPS and sales growth), with a higher percentile indicating a higher growth company </p>
+            <p> <span class = "font-italic"> Financial Returns </span> </p>
+            <p> Based on a stock's forward-looking ROE, ROCE and CROCI (for financial stocks, only ROE), with a higher percentile indicating a company with higher financial returns </p>
+            <p>
+            <span class = "font-italic"> Multiple (e.g., valuation) </span> </p>
+            <p> Based on a stock's forward-looking P/E, P/B, price/dividend (P/D), EV/EBITDA, EV/FCF and EV/Debt Adjusted Cash Flow (DACF) (for financial stocks, only P/E, P/B and P/D), with a higher percentile indicating a stock trading at a higher multiple
+            </p>
+            <p>
+            <span class = "font-italic"> Integrated Factor </span> </p>
+            <p> 
+            A composite of Growth, Financial Returns and Multiple, calculated as the average of the Growth percentile, Financial Returns percentile and (100% - Multiple percentile)
+            </p>
+          </div>
+          <div class="card-footer small text-muted">Last updated: {{ date }}</div>
+        </div>
+
+        <!-- DataTables Example -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Discounted Cash Flow Analysis</div>
+          <div class="card-body">
+            <p class = "font-weight-bold"> 
+              How did we calculate the value?
+            </p>
+            <p class = "font-weight-light">
+              Using a combination of accounting principles and various machine learning algorithms based on historical market data, we are able to use predictive learning to help assist with financial analysis of publically traded companies.
+            </p>
+            <div class = "font-weight-bold>">
+              Projected Free Cash Flow
+            </div>
+              <canvas id="CashFlowChart" width="100%" height="60"></canvas>
+            <div class="table-responsive">
+              <table class="table table-bordered" id="NOBRO" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Ticker</th>
+                    <th>Discount Rate</th>
+                    <th>Terminal Value </th>
+                    <th>EBIDTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ ticker }} </td>
+                    <td>{{ discountRate }}%</td>
+                    <td>${{ terminalValue }}</td>
+                    <td>${{ EBIDTA }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>DCF</th>
+                    <th>Actual </th>
+                    <th>% Difference</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Share Value</td>
+                    <td>${{ shareValue }}</td>
+                    <td>${{ marketShareValue }}</td>
+                    <td> {% if shareDiff >= 0 %}
+                    <span class ="text-success"> {{ shareDiff }}%</span>
+                    {% else %}
+                      <span class ="text-danger"> {{ shareDiff }}%</span>
+                    {% endif %}</td>
+                  </tr>
+                  <tr>
+                    <td>Corporate Valuation</td>
+                    <td>${{ DCF }}</td>
+                    <td>${{ marketCap }}</td>
+                    <td> {% if evalDiff >= 0 %}
+                    <p class ="text-success"> {{ evalDiff }}%</span>
+                    {% else %}
+                      <span class ="text-danger"> {{ evalDiff }}%</span>
+                    {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer small text-muted">Last updated: {{ date }}</div>
+        </div>
+
+      </div>
+      <!-- /.container-fluid -->
+
+      <!-- Sticky Footer -->
+      <footer class="sticky-footer">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright © Deep Finalyst 2019</span>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+    <!-- /.content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below {{ projectedCashFlow }} if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="login.html">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+  <!-- Page level plugin JavaScript-->
+  <script src="{{ url_for('static', filename='vendor/chart.js/Chart.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/datatables/jquery.dataTables.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/datatables/dataTables.bootstrap4.js') }}"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="{{ url_for('static', filename='js/sb-admin.min.js') }}"></script>
+
+  <!-- Demo scripts for this page-->
+  <script src="{{ url_for('static', filename='js/demo/datatables-demo.js') }}"></script>
+  <script>
+    // Set new default font family and font color to mimic Bootstrap's default styling
+Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+Chart.defaults.global.defaultFontColor = '#292b2c';
+
+// Area Chart Example
+var ctx = document.getElementById("myAreaChart");
+var myLineChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ["2012", "", "", "", "", "", "", "", "", "", "", "", "", "2018"],
+    datasets: [{
+      label: "Growth",
+      lineTension: 0.3,
+      backgroundColor: "rgba(2,117,216,0)",
+      borderColor: "rgba(2,117,216,1)",
+      pointRadius: 5,
+      pointBackgroundColor: "rgba(2,117,216,1)",
+      pointBorderColor: "rgba(255,255,255,0.8)",
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: "rgba(2,117,216,1)",
+      pointHitRadius: 50,
+      pointBorderWidth: 2,
+      data: [{% for item in growthData %}
+                {{item}},
+              {% endfor %}],
+    },
+    {
+      label: "Financial Returns",
+      lineTension: 0.3,
+      backgroundColor: "rgba(2,218,53,0)",
+      borderColor: "rgba(2,218,53,1)",
+      pointRadius: 5,
+      pointBackgroundColor: "rgba(2,218,53,1)",
+      pointBorderColor: "rgba(255,255,255,0.8)",
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: "rgba(2,218,53,1)",
+      pointHitRadius: 50,
+      pointBorderWidth: 2,
+      data: [{% for item in financialReturnsData %}
+                {{item}},
+              {% endfor %}],
+    },
+    {
+      label: "Integerated",
+      lineTension: 0.3,
+      backgroundColor: "rgba(218,2,2,0)",
+      borderColor: "rgba(218,2,2,1)",
+      pointRadius: 5,
+      pointBackgroundColor: "rgba(218,2,2,1)",
+      pointBorderColor: "rgba(255,255,255,0.8)",
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: "rgba(218,2,2,1)",
+      pointHitRadius: 50,
+      pointBorderWidth: 2,
+      data: [{% for item in integeratedData %}
+                {{item}},
+              {% endfor %}],
+    },
+    {
+      label: "Multiple",
+      lineTension: 0.3,
+      backgroundColor: "rgba(155,28,252,0)",
+      borderColor: "rgba(155,28,252,1)",
+      pointRadius: 5,
+      pointBackgroundColor: "rgba(155,28,252,1)",
+      pointBorderColor: "rgba(255,255,255,0.8)",
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: "rgba(155,28,252,1)",
+      pointHitRadius: 50,
+      pointBorderWidth: 2,
+      data: [{% for item in multipleData %}
+                {{item}},
+              {% endfor %}],
+    },],
+  },
+  options: {
+    scales: {
+      xAxes: [{
+        time: {
+          unit: 'date'
+        },
+        gridLines: {
+          display: true
+        },
+        ticks: {
+          maxTicksLimit: 7
+        }
+      }],
+      yAxes: [{
+        ticks: {
+          min: 0,
+          max: 1,
+          maxTicksLimit: 10
+        },
+        gridLines: {
+          color: "rgba(0, 0, 0, .125)",
+        }
+      }],
+    },
+    legend: {
+      display: true
+    }
+  }
+});
+
+myLineChart.update();
+
+  </script>
+
+  <script>
+    // Set new default font family and font color to mimic Bootstrap's default styling
+Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+Chart.defaults.global.defaultFontColor = '#292b2c';
+
+// Area Chart Example
+var ctx = document.getElementById("CashFlowChart");
+var myLineChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ["2019 Q3", "2019 Q4", "2020 Q1", "2020 Q2", "2020 Q3", "2020 Q4", "2021 Q1", "2021 Q2", "2021 Q3", "2021 Q4", "2022 Q1", "2022 Q2", "2022 Q3", "2022 Q4"],
+    datasets: [{
+      label: "Projected Cash Flow",
+      lineTension: 0.3,
+      backgroundColor: "rgba(25,255,0,0)",
+      borderColor: "rgba(25,255,0,1)",
+      pointRadius: 5,
+      pointBackgroundColor: "rgba(25,255,0,1)",
+      pointBorderColor: "rgba(255,255,255,0.8)",
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: "rgba(25,255,0,1)",
+      pointHitRadius: 50,
+      pointBorderWidth: 2,
+      data: [{% for item in projectedCashFlow %}
+                [{{item}}],
+              {% endfor %}],
+    },],
+  },
+  options: {
+    scales: {
+      xAxes: [{
+        time: {
+          unit: 'date'
+        },
+        gridLines: {
+          display: true
+        },
+        ticks: {
+          maxTicksLimit: 7
+        }
+      }],
+      yAxes: [{
+        ticks: {
+          min: {{ projectedCashFlow | min }},
+          max: {{ projectedCashFlow | max }},
+          maxTicksLimit: 10
+        },
+        gridLines: {
+          color: "rgba(0, 0, 0, .125)",
+        }
+      }],
+    },
+    legend: {
+      display: true
+    }
+  }
+});
+
+myLineChart.update();
+
+  </script>
+
+</body>
+
+</html>
