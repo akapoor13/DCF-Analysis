@@ -21,7 +21,7 @@ The web interface was built using a combination of HTML, CSS, and JavaScript. We
 Finding the necessary data for DeepFinalyst proved exceptionally difficult, as we had to collect and combine data from several different APIs to create a comprehensive analysis. Additionally, the deep learning algorithm is relatively unstable, as historical training data is only relevant until a certain point, after which it becomes too archaic, leaving very little training data to work with.
 
 ## Major Accomplishments
-It works!!!
+It works!!! ML Model within 5%-10% accuracy.
 
 ## What We Learned
 Don't watch anime while working, especially if it's a good one.
